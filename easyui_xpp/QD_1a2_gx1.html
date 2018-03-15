@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>渠道跟进</title>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+
+    <script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="DataTables/datatables.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+    <script src="../js/layer.js"></script>
+    <script src="../js/laydate.js"></script>
+    <script type="text/javascript" src="../xppjs/scrollpagination.js"></script>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/datatables.css"/>
+    <link rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/1a2_gx1.css">
+
+    
+    <!-- 11月09新增start -->
+
+    <script type="text/javascript">
+      var NameOfCookie="rsList";
+      var c = document.cookie.indexOf(NameOfCookie+"=");
+      if (c != -1)
+      {
+        console.log("第一次js检测已经登陆");
+      }
+      else
+      {
+        layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+          window.location.href="../login.html";
+        });
+      }
+      var table_ye2,a2data,curD,uuid,reMark,Dat,index;//全局变量
+      var relod = {};
+      $(document).ready(function() {
+        var NameOfCookie = "rsList";
+        var c = document.cookie.indexOf(NameOfCookie + "=");
+        // alert(c);
+        if (c != -1) {
+          //判断已经退出登陆
+          if ($.cookie("rsList") == "") {
+            console.log("检测没有权限，重新登录或联系管理员");
+            window.location.href = "../login.html";
+          }
+          console.log("jquery里检测已经登陆");
+        }
+        else {
+          console.log("jquery里检测没有登陆");
+          window.location.href = "../login.html";
+        }
+        //按钮权限开始
+        function funBtn(){
+            $( ".opener" ).hide();
+            $( ".delbut" ).hide();
+            var viewArr = $.cookie("rsList").split(",");
+            for (var i = 0; i < viewArr.length; i++) {
+                if(viewArr[i]=="Ab2a") {$( ".opener" ).show();}
+                if(viewArr[i]=="Ab2b") {$( ".delbut" ).show();}
+            }//end for
+        }
+        funBtn();
+        // layer编辑弹窗
+        function editWin(){
+            index = layer.open({
+                type: 1,
+                title:'编辑',
+                closeBtn: 1,
+                area: ['460px', '415px'],
+                content: $('#dialog')       
+            });
+        }
+        //laydatetime
+          laydate.render({
+            elem: '#recordDate', //指定元素
+            type: 'datetime',
+            value: new Date()
+          });
+          laydate.render({
+              elem: '#recordDateEdit', //指定元素
+              type: 'datetime'
+          });
+          /*第零步：把datatables插件的警告窗变成控制台打印*/
+        $.fn.dataTable.ext.errMode = 'none';
+//------------以下部分是修改标题栏信息-start-----------
+        huiFunc1();
+        //步骤1_xL3，在步骤1的ajax的回调函数,展示列表数据
+        function huiFunc1(result){
+
+          console.log($.cookie());
+          var obj = $.cookie();
+          uuid = obj.ck_uuid_ditch;
+          $("#ck_company").html(obj.ck_company);
+          $("#ck_empName").html(obj.ck_empName);
+          $("#ck_job").html(obj.ck_job);
+          $("#ck_name").html(obj.ck_name);
+          $("#ck_phone").html(obj.ck_phone);
+          $("#ck_rank").html(obj.ck_rank);
+          $("#ck_weixin").html(obj.ck_weixin);
+        }// end 1_x1 外圈
+        //----------第一部分--以上部分是修改标题栏信息------------
+
+        //-----------第二部分列表展示和功能------------
+        //步骤1,展示列表数据
+        var page = 0;
+
+    $(function() {
+
+        // 底部加载进度条
+        var loadinghtml = '<div class="loading" id="loading" style="background-color: #d9d9d9">正在加载,请稍后...</div>';
+        var nomoreresults = '<div class="loading" id="nomoreresults" style="background-color: #d9d9d9">到达底线，已全部加载!</div>';
+        relod = $('#gzjl_List').scrollPagination({
+        // 你要搜索结果的页面
+        'contentPage': {},
+        // 你可以通过 children().size() 知道哪里是分页[JSON格式]
+        'contentData': {
+            "ditchUuid": uuid,
+            "currentPage":page,
+            "maxResult":"3"
+        },
+        // 谁该怎么滚动？在这个例子中，完整的窗口
+        'scrollTarget': $("#gzjl_show"),
+        // 在页面到达结束之前，从多少像素开始加载？
+        'heightOffset': 1,
+        // 前负荷，一些功能，可能显示一个加载DIV
+        'beforeLoad': function() {
+            // 翻页页数累加
+           $('#loading').fadeIn();
+        },
+        'beforeSend': function() {
+            // 加载区域显示
+//            $('#loading').remove();
+
+//            $('.BookLibrarySearchList').append(loadinghtml);
+        },
+        'dataType': 'JSON',
+        'loader': function(data) {
+            zResult = data.qingqiu;
+            // 隐藏加载区域
+            $('#loading').remove();
+            var data = data.data;
+            if (data.length <= 0) {
+                $('#gzjl_List').append(nomoreresults);
+                $('#nomoreresults').fadeIn();
+                $('#gzjl_List').stopScrollPagination();
+            } else {
+                for (var i = 0; i < data.length; i++) {
+                    var Obj = data[i];
+                    console.log(Obj);
+                    var html = "";
+                    html += "<div class=\"show_box\"style=\"border:1px solid #d9d9d9;border-radius:5px;margin-top:20px;margin-right:20px;padding:10px 20px;\">";
+                    html += "    <div class=\"jl_date\"style=\"border-bottom:1px solid #d9d9d9;height:25px;line-height:25px;color:#757574;\">"+Obj.recordDate+"</div>";
+                    html += "    <div class=\"jl_remark\"style=\"line-height:40px;font-size:20px;margin-bottom:20px;\">"+Obj.remarkText+"</div>";
+                    html += "    <div class=\"jl_uuid\"style=\"display:none;\">"+Obj.uuid+"</div>";
+                    html += "<div class=\"btn-box btn\" style=\"margin-top:30px;\">";
+                    html += "<button  class=\"easyui-linkbutton btn-qr opener\" >修改</button>";
+                    html += "<button  class=\"easyui-linkbutton btn-qr delbut\" >删除</button>";
+                    html += "</div>";
+                    html += "</div>";
+                    $('#gzjl_List').append(html);
+                }
+              funBtn();
+            }
+        },
+        'afterLoad': function(elementsLoaded,max) {
+          var max = Number(max);
+          var i = 0;
+          console.log(max);
+//          $(elementsLoaded).fadeInWithDelay();
+             if ($('#gzjl_List').children().size() == max) {
+               console.log($('#gzjl_List').children().size());
+             $('#gzjl_List').append(nomoreresults);
+             $('#gzjl_List').stopScrollPagination();
+             }
+
+        }
+    });
+      // code for fade in element by element
+        $.fn.fadeInWithDelay = function(){
+        var delay = 0;
+        return this.each(function(){
+          $(this).delay(delay).animate({opacity:1}, 2000);
+          delay += 1000;
+        });
+      };
+    });
+
+        
+      //步骤3，删除按钮单击事件
+        $( "#gzjl_List" ).on("click",".delbut",function() {
+          var that = $(this);
+          layer.confirm('确定删除此条信息么？', {icon: 3, title:'提示'}, function(index){
+            //要初始化一个对象，不然会报undifine未定义错误
+            var delRowData = {};
+            //获取选择那一行的数据
+            var Auuid = that.parent().prevAll()[0].outerText||that.parent().prevAll()[0].textContent;
+            //post请求体传给后台的js对象
+            var send_data = {};
+            send_data.uuid = Auuid;
+            send_data.userUuid = $.cookie("ckUserEmpUuid");
+            send_data.userName = $.cookie("ckUserName");
+            // alert( "选择的行的uuid: "+send_data);
+            //调用ajax方法传给后台接口
+            $.ajax({
+              url:"/QDcrm/aaRecord?qqiu=delete",
+              type: "POST",
+              //data: JSON.stringify(param),
+              data: JSON.stringify(send_data),
+              contentType: "application/json;charset=UTF-8",
+              success:function(result){
+                var obj = JSON.parse(result);
+                layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:5,icon:1},function(){
+                  window.location.reload();
+                });
+
+              }
+            });//end $.ajax
+            layer.close(index);
+          });
+      } );//end 3 外圈 $('#delbut').click
+    //步骤5，编辑打开事件
+    $( "#gzjl_List" ).on("click",".opener",function() {
+      var editData = {};
+      console.log($(this).parent().prevAll());
+      reMark = $(this).parent().prevAll()[1];
+      dat = $(this).parent().prevAll()[2];
+      editData.remark = reMark.outerText||reMark.textContent;
+      editData.date = dat.outerText||dat.textContent;
+      console.log(editData);
+      uuid = $(this).parent().prevAll()[0].outerText||$(this).parent().prevAll()[0].textContent;
+//      $("#recordDateEdit").datetimebox('setValue',editData.date);
+      $("#recordDateEdit").val(editData.date);
+      $("#remarkTextEdit")[0].value = editData.remark;
+      console.log($("#remarkTextEdit")[0].innerHTML);
+      console.log($("#remarkTextEdit"));
+      editWin();
+    });//end 5 外圈 opener 结束打开对话框
+
+      function yzV1() {
+            var R = document.getElementById("remarkText").value==''?false:true;
+            var T = $('#recordDate').val()==''?false:true;
+            if(!T){
+              layer.alert("请选择跟进日期",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(!R){
+              layer.alert("请填写跟踪反馈",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(R&&T){
+               console.log("有值,可以提交"); 
+               return true;
+            }else{
+               return false;
+            }
+        };
+      function yzV2() {
+            var R = document.getElementById("remarkTextEdit").value==''?false:true;
+            var T = $('#recordDateEdit').val()==''?false:true;
+            if(!T){
+              layer.alert("请选择跟进日期",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(!R){
+              layer.alert("请填写跟踪反馈",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(R&&T){
+               console.log("有值,可以提交"); 
+               return true;
+            }else{
+               return false;
+            }
+        };
+    //步骤6，添加确定事件
+    //TODO:提交表单数据到服务器调用查询冲突接口
+    $( "#submitAddForm" ).click(function() {
+      var flag = yzV1();
+      if(flag){
+        var add_data = $("#ffAdd").serializeObject();
+        add_data.ditchUuid = $.cookie('ck_uuid_ditch');
+        add_data.userUuid = $.cookie("ckUserEmpUuid");
+        add_data.userName = $.cookie("ckUserName");
+        console.log(add_data);
+        $.ajax({
+          url:"/QDcrm/aaRecord?qqiu=add",
+          type: "POST",
+          //data: JSON.stringify(param),
+          data: JSON.stringify(add_data),
+          contentType: "application/json;charset=UTF-8",
+          success:function(result){
+            var obj = JSON.parse(result);
+            var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+            var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+            layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(index){
+              $("#gzjl_List").prepend("<div class=\"show_box\"style=\"border:1px solid #d9d9d9;border-radius:5px;margin-top:20px;margin-right:20px;padding:10px 20px;\"><div class=\"jl_date\"style=\"border-bottom:1px solid #d9d9d9;height:50px;line-height:50px;color:#757574;\">"+add_data.recordDate+"</div><div class=\"jl_remark\"style=\"line-height:40px;font-size:20px;margin-bottom:20px;\">"+add_data.remarkText+"</div><div class=\"jl_uuid\"style=\"display:none;\">"+obj.data+"</div><div class=\"btn-box btn\" style=\"margin-top:30px;\"><button  class=\"easyui-linkbutton btn-qr opener\" >修改</button><button  class=\"easyui-linkbutton btn-qr delbut\" >删除</button></div></div>");
+              $('#ffAdd').form('clear');
+              layer.close(index);
+            });
+          }
+        });
+      }
+    });//end 6 外圈 submitForm
+    //修改确定事件
+    //TODO:提交表单数据到服务器调用查询冲突接口
+    $( "#submitEditForm" ).click(function() {
+      var flag = yzV2();
+      if(flag){
+        var add_data = $("#ffDlg").serializeObject();
+        add_data.uuid = uuid;
+        add_data.userUuid = $.cookie("ckUserEmpUuid");
+        add_data.userName = $.cookie("ckUserName");
+        console.log(add_data);
+        $.ajax({
+          url:"/QDcrm/aaRecord?qqiu=edit",
+          type: "POST",
+          //data: JSON.stringify(param),
+          data: JSON.stringify(add_data),
+          contentType: "application/json;charset=UTF-8",
+          success:function(result){
+            var obj = JSON.parse(result);
+            var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+            var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+            // layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(index){
+            //   $( "#dialog" ).dialog( "close" );
+            //   reMark.innerHTML = add_data.remarkText;
+            //   dat.innerHTML = add_data.recordDate;
+            //   layer.close(index);
+            // });
+            layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:0,anim:j,icon:i}, function(indexone){
+              layer.close(indexone);
+              if(obj.message.indexOf('重复')==-1){
+                layer.close(index);
+                reMark.innerHTML = add_data.remarkText;
+                dat.innerHTML = add_data.recordDate;
+              }
+            });
+          }
+        });
+      }
+    });//end 6 外圈 submitForm
+    // 清除弹框数据
+    $('#clearDlgForm').click(function(){
+        $('#ffDlg').form('clear');
+    });//end function clearForm
+    //清除添加表单数据
+     $('#clearAddForm').click(function(){
+        $('#ffAdd').form('clear');
+    });//end function clearForm
+
+
+
+
+  //步骤1,展示完成
+  //步骤1_2展示列表日历数据
+
+  function huiFuncListCalend(result){
+
+    var keDayList = new Array();
+    var a2obj = {};
+    a2obj = JSON.parse(result);
+    a2data = a2obj.data;
+    $.each(a2data, function (index, obj) {
+      // alert(index + "...日期有..." + obj.keDateTime);
+      var dateStr = new String(obj.keDateTime);
+      keDayList.push(dateStr);
+    });
+    return keDayList;
+  }// end  huiFuncList外圈 1_x1
+
+} );//end 最外层 $(document).ready
+
+    </script>
+</head>
+<body>
+
+<div id="fen_3a2detail_container" style="overflow-y:hidden;background-color:#FFFFFF;">
+
+    <div id="ye_1_content01" class="class-xq">
+        <div id="litle_a1" class="xq-logo">
+        </div>
+        <div class="change_add">
+            <div id="litle_a2" class="tit_txt">
+                <strong class="fir">渠道姓名:</strong><strong id="ck_name">__空__</strong>
+            </div>
+            <div id="litle_a3" class="tit_txt">
+                <strong class="fir">联系电话:</strong><em id="ck_phone">__空__</em>
+                <i>&nbsp;&nbsp;</i>
+                <strong class="fir">微信号:</strong><em id="ck_weixin">__空__</em>
+            </div>
+            <div id="litle_a4" class="tit_txt">
+                <strong class="fir">负责人:</strong><em id="ck_empName">__空__</em>
+                <i>&nbsp;&nbsp;</i>
+                <strong class="fir">渠道等级:</strong><em id="ck_rank">__空__</em>
+                <i>&nbsp;&nbsp;</i>
+                <strong class="fir">单位:</strong><em id="ck_company">__空__</em>
+                <i>&nbsp;&nbsp;</i>
+                <strong class="fir">职位:</strong><em id="ck_job">__空__</em>
+            </div>
+        </div>
+
+
+        <div id="litle_a5" class="tit-btn">
+            <a class="return-link" href="javascript:window.location.href='QD_1a2.html';">返回上一页</a>
+        </div>
+
+
+    </div><!-- end div ye_1_content01 -->
+
+    <div id="ye_2_blank"></div>
+    <div class="add_block">
+        <!-- 跟踪记录 -->
+        <div id="gzjl">
+          <div id="gzjl_container">
+            <div id="header_2">
+                    <h2>跟踪记录</h2>
+            </div>
+            <div id="gzjl_show">
+              <div id="gzjl_List">
+                
+                <div class="loading" id="loading">正在加载,请稍后...</div>
+                
+              </div>
+             
+            </div>
+          
+            </div>
+        </div>
+        <!-- 添加跟踪记录 -->
+        <div id="add_jl">
+            <div id="ye_3_text_container">
+                <div id="header_1">
+                    <h2>添加跟踪反馈</h2>
+                </div>
+                <div id="header_3_form">
+                    <form id="ffAdd" method="post">
+                        <div id="header_3_tb1" class="tab-style"style="width:100%;">
+
+                            <!-- 第一行 -->
+                            <div style="margin:20px 0 ;">
+                                跟进时间
+                                <input id="recordDate" name="recordDate" class="yzss "required="required">
+                            </div>
+                            <!-- 第一行结束 -->
+                            <div style="margin-bottom:20px 0 ;">
+                                <!-- <input id="remarkText" class="easyui-textbox yzss" data-options="multiline:true" name="remarkText" style="width:100%;height:100px"> -->
+                                <textarea id="remarkText" name="remarkText" class="yzss" placeholder="请输入您的跟踪反馈" style="width:100%;height:100px;color:black;resize: none"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- 按钮div开始 -->
+                    <div class="btn-box" >
+                        <a href="javascript:void(0)" class="easyui-linkbutton btn-xk" id="clearAddForm">清空</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton btn-qr" id="submitAddForm">确认</a>
+                    </div>
+                    <!-- 按钮div结束 -->
+                </div><!-- end div  header_3_form-->
+
+            </div><!-- end div  ye_3_text_container-->
+        </div>
+    </div>
+    <!-- 修改弹窗 -->
+    <!-- 最后放对话框div -->
+    <div id="dialog" class="alert-w" style="width:420px;
+height: 350px;padding:0 20px;display:none;">
+    <!--<p>对话框</p>-->
+    <form id="ffDlg" name="ffnameDlg" method="post" > 
+      <div id="header_3_tb1" class="tab-style"style="width:100%;">
+        <!-- 第一行 -->
+        <div style="margin:20px 0 ;">
+            跟进时间
+            <input id="recordDateEdit" name="recordDate" class="yzss "required="required">
+        </div>
+        <!-- 第一行结束 -->
+        <div style="margin-bottom:20px 0 ;">
+            <!-- <input id="remarkText" class="easyui-textbox yzss" data-options="multiline:true" name="remarkText" style="width:100%;height:100px"> -->
+            <textarea id="remarkTextEdit" name="remarkText" class="yzss" placeholder="请输入您的跟踪反馈" style="width:100%;height:200px;color:black;resize: none"></textarea>
+        </div>
+      </div>
+    </form>
+    <!-- 按钮div开始 -->
+    <div class="btn-box">
+    <button  class="easyui-linkbutton btn-xk" id="clearDlgForm">清空</button>
+    <button  class="easyui-linkbutton btn-qr" id="submitEditForm">确认</button>
+    </div>
+    <!-- 按钮div结束 -->
+    </div><!-- end id=dialog -->
+    <!--修改日期输入框样式-->
+<script>
+    $(function(){
+        $('.combo').css({
+            "height":"34px",
+            "width":"200px"
+        });
+        $('.combo .combo-text').css({
+            "height":"34px",
+            "width":"160px"
+        });
+    })
+</script>
+    <!-- E--公用弹窗 -->
+</body>
+</html>

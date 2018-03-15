@@ -1,0 +1,155 @@
+@charset "utf-8";
+*{
+    margin:0;
+    padding:0;
+    font-family: "黑体";
+}
+
+/*最外面的tab样式*/
+.tab-con{
+    width: 1100px;
+    height: 850px;
+    padding:40px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: white;
+    margin:0 auto;
+}
+#header_1 h2{
+    font-size: 18px;
+    color:#737373;
+    font-weight: 600;
+    line-height: 16px;
+}
+.tit_style h3{
+    font-size: 16px;
+    color:#18be76;
+    padding-top:30px;
+    font-weight: normal;
+    line-height: 16px;
+}
+/* tab标签 */
+.tab-style{
+    clear: both;
+    font-size:16px;
+}
+.tab-style tr{
+    display: block;
+    margin-top:20px;
+}
+.yzss{
+    width:200px;
+    height:36px;
+    line-height: 34px;
+    border:1px solid #d9d9d9;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size:16px;
+    color:#646464;
+    padding-left:10px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+}
+.sel_s{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color:#828282;
+    background:url(../HMimages/arrow.jpg) no-repeat scroll right center transparent;
+}
+.name-s{
+    padding-right:20px;
+    color:#4c4c4c;
+    padding-left:120px;
+}
+/*  */
+.btn-box{
+    clear:both;
+    text-align: right;
+    margin-top:50px;
+    margin-right:10px;
+}
+.btn-box .btn-xk{
+    font-size:16px;
+    color:#4c4c4c;
+    padding:0 20px;
+    border:none;
+    margin:0;
+    background: none;
+    line-height: 36px;
+    background-color: #d9d9d9;
+    -webkit-border-radius:5px;;
+    -moz-border-radius:5px;;
+    border-radius:5px;
+}
+.btn-box .btn-qr{
+    font-size:16px;
+    color:white;
+    padding:0 20px;
+    background: none;
+    background-color: #3ccb93;
+    line-height: 36px;
+    border:none;
+    margin:0;
+    margin-left:20px;
+    -webkit-border-radius:5px;;
+    -moz-border-radius:5px;;
+    border-radius:5px;
+}
+.btn-box .btn-qr:hover{
+    background-color:#3ed79c;
+}
+.btn-box .btn-xk:hover{
+    background-color:#e4e4e4;
+}
+.l-btn-text{
+    font-size:16px;
+    line-height: 36px;
+}
+/* 公用弹窗样式 */
+.alert-main{
+    width:400px;
+    position:absolute;
+    top: 5px;
+    left:50%;
+    margin-left:-200px;
+    line-height: 34px;
+    padding:10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    -moz-box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    z-index: 999;
+    display: none;
+}
+.alert-main p{
+    position: relative;
+    text-align: center;
+    color:#ff2f2f;
+    font-size:16px;
+    line-height:24px;
+}
+.alert-main .close-item{
+    position: absolute;
+    right:0;
+    top: -5px;
+    cursor: pointer;
+    font-size:20px;
+    color:#868686;
+}
+/* 鼠标经过btn按钮样式改变 */
+.btn-box .btn-xk:hover ,.btn-box .btn-qr:hover{
+    background-color: #999;
+    color:#f2f2f2;
+}
+
+
+

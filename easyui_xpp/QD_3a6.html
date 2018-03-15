@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>部门管理</title>
+	
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+	<script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="DataTables/datatables.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+	<script src="../js/layer.js"></script>
+	<link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+	<link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/datatables.css"/>
+    <link   rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/QD_3a6.css"/>
+    <style>
+        .dataTables_wrapper{
+            top:-67px;
+        }
+        .dataTables_wrapper .dataTables_info{
+            clear: none;
+            float: right;
+            padding-right: 20px;
+            margin-top:20px;
+        }
+        .dataTables_wrapper .dataTables_paginate{
+            float: right;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:active{
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:active{
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            border:1px solid transparent;
+        }
+        table.dataTable.display tbody tr.even td.sorting_1{
+            background-color: white;
+        }
+    </style>
+    <!-- <script src="../js/jquery-1.8.2.js" type="text/javascript"></script> -->
+	<script type="text/javascript">
+      var NameOfCookie="rsList";
+      var c = document.cookie.indexOf(NameOfCookie+"=");
+      if (c != -1)
+      {
+        console.log("第一次js检测已经登陆");
+      }
+      else
+      {
+        layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+          window.location.href="../login.html";
+        });
+      }
+    $(document).ready(function() {
+      var NameOfCookie = "rsList";
+      var index;
+      var c = document.cookie.indexOf(NameOfCookie + "=");
+      // alert(c);
+      if (c != -1) {
+        //判断已经退出登陆
+        if ($.cookie("rsList") == "") {
+          console.log("检测没有权限，重新登录或联系管理员");
+          window.location.href = "../login.html";
+        }
+        console.log("jquery里检测已经登陆");
+      }
+      else {
+        console.log("jquery里检测没有登陆");
+        window.location.href = "../login.html";
+      }
+        //按钮权限开始
+        function funBtn(){
+            
+            $( "#opener" ).hide();
+            $( "#delbut" ).hide();
+            var viewArr = $.cookie("rsList").split(",");
+            for (var i = 0; i < viewArr.length; i++) {
+               if(viewArr[i]=="Cf1") {$( "#opener" ).show();}
+               if(viewArr[i]=="Cf2") {$( "#delbut" ).show();}
+                
+            }//end for
+        }
+        funBtn();
+        // layer编辑弹窗
+        function editWin(){
+            index = layer.open({
+                type: 1,
+                title:'编辑',
+                closeBtn: 1,
+                area: ['820px', '510px'],
+                content: $('#dialog')       
+            });
+        }
+        /*第零步：把datatables插件的警告窗变成控制台打印*/
+        $.fn.dataTable.ext.errMode = 'none';
+    //步骤1,展示列表数据
+        var tabShowText;
+        var table = $('#example').DataTable( {
+        "dom":'frtpi',
+        "bLengthChange":false,
+        bSort:true,
+        language: {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "共 _TOTAL_ 项",
+            "sInfoEmpty": "共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },//国际化语言结束
+        "ajax": "/QDcrm/aaDepartment?qqiu=list",
+        "columns": [
+            { "data": "name" },
+//            { "data": "campus" },
+            { "data": "remark" },
+            {
+                "data": null,
+                "searchable": true,
+                "title": "状态"
+            }
+        ],
+        "columnDefs":[{
+            "targets": -1,
+            "data": tabShowText,
+            "name": "状态",
+            "cellType": "th",
+            "orderDataType": "dom-text",
+            "orderSequence": [ "desc","asc", "asc" ],
+            "className": "my_class",
+            "contentPadding": "mmm",
+            "createdCell": function (td, cellData, rowData, row, col) {
+                if ( cellData.openAndclose == 'open' ) {
+                    tabShowText = '已开启';
+                    $(td).context.innerHTML="<button style='color: white;border:none;border-radius: 5px;background-color: #36cb91;line-height: 30px;text-align: center;width: 100px;font-size: 14px;'>"+ tabShowText +"</button>";
+
+                }else{
+                    tabShowText = '已关闭';
+                    $(td).context.innerHTML="<button style='color: white;border:none;border-radius: 5px;background-color: #ff4949;line-height: 30px;text-align: center;width: 100px;font-size: 14px;'>"+ tabShowText +"</button>";
+
+                }
+            }
+        }]
+    } );//end 步骤1 外圈  $('#example').DataTable
+
+        $('#example tbody').on( 'click', 'button', function () {
+            var send_data = {};
+            send_data.uuid = table.row( $(this).parents('tr') ).data().uuid;
+            table.row( $(this).parents('tr') ).data().openAndclose == 'open'?send_data.openAndclose = 'close':send_data.openAndclose = 'open';
+
+            $.ajax({
+
+                url:"/QDcrm/aaDepartment?qqiu=on_off",
+                type: "POST",
+                //data: JSON.stringify(param),
+                data: JSON.stringify(send_data),
+                contentType: "application/json;charset=UTF-8",
+                success:function(result){
+                  var obj = JSON.parse(result);
+                  layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:5,icon:1});
+                  table.row( $(this).parents('tr') ).ajax.reload();
+                }
+
+            });//end $.ajax
+        } );//end 步骤1 外圈  $('#example').DataTable
+
+    //步骤2，列表选择
+    var selectTable = $('#example tbody').on( 'click', 'tr', function () {
+        if ( $(this).hasClass('selected') ) {
+            $(this).removeClass('selected');
+        }
+        else {
+            table.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }//end if 
+
+    } );//end 2 外圈 $('#example tbody').on
+
+    //步骤3，删除按钮单击事件
+    $('#delbut').click( function () {
+
+        //要初始化一个对象，不然会报undifine未定义错误
+        var delRowData = {};
+        //获取选择那一行的数据
+         delRowData = table.row('.selected').data();
+         //获取选择行中的uuid字段
+         var Auuid = delRowData.uuid;
+         
+         //post请求体传给后台的js对象
+         var send_data = {};
+         send_data.uuid = Auuid;
+         // alert( "选择的行的uuid: "+send_data);
+         //调用ajax方法传给后台接口
+         layer.confirm('确定要删除?', {icon: 3, title:'提示'}, function(index){
+            $.ajax({
+              url:"/QDcrm/aaDepartment?qqiu=delete",
+              type: "POST",
+              data: JSON.stringify(send_data),
+              contentType: "application/json;charset=UTF-8",
+              success:function(result){
+                layer.alert(JSON.parse(result).message,{skin:'layui-layer-molv',closeBtn:1,anim:5,icon:1});
+              }
+
+            });//end $.ajax
+              /* 弹窗事件 */
+            table.row('.selected').remove().draw( false );//图形删除，没有传到后台接口
+            layer.close(index);
+          });
+    } );//end 3 外圈 $('#delbut').click
+    //步骤5，编辑打开事件
+    $( "#opener" ).click(function() {
+
+        //要初始化一个对象，不然会报undifine未定义错误
+        var delRowData = {};
+        //获取选择那一行的数据
+         delRowData = table.row('.selected').data();
+         document.ffname.name.value= delRowData.name;
+//         document.ffname.campus.value= delRowData.campus;
+         document.ffname.remark.value= delRowData.remark;
+
+        var n1 = document.ffname.name.value; //定义个变量n接收表单中的值
+        editWin();
+    });//end 5 外圈 opener 结束打开对话框
+
+    //步骤6，编辑确定事件
+    $( "#submitForm" ).click(function() { 
+        //要初始化一个对象，不然会报undifine未定义错误
+            var delRowData = {};
+            //获取选择那一行的数据
+            delRowData = table.row('.selected').data();
+//            alert(delRowData.name);
+            
+            // var param = $("#ff").serializeObject();
+            var send_edit_data = {};
+            send_edit_data.uuid = delRowData.uuid;
+            send_edit_data.name = document.ffname.name.value;
+//            send_edit_data.campus = document.ffname.campus.value;
+            send_edit_data.remark = document.ffname.remark.value;
+            console.log(send_edit_data);
+            $.ajax({
+                url:"/QDcrm/aaDepartment?qqiu=edit",
+                type: "POST",
+                data: JSON.stringify(send_edit_data),
+                contentType: "application/json;charset=UTF-8", 
+                success:function(result){
+                    var obj = JSON.parse(result);
+                    var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+                    var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+                    // layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(){
+                    //     window.location.reload();
+                    // });
+                    layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:0,anim:j,icon:i}, function(indexone){
+                      layer.close(indexone);
+                      if(obj.message.indexOf('重复')==-1){
+                        layer.close(index);
+                        window.location.reload();
+                      }
+                    });
+                }
+            });
+
+
+    });//end 6 外圈 submitForm
+
+
+    //步骤7，关闭修改对话框
+    $( "#close" ).click(function() { 
+        layer.close(index);
+    });//end 7 外圈 close
+    
+} );//end 最外层 $(document).ready
+
+
+        function clearForm(){
+            $('#ff').form('clear');
+        };//end function clearForm
+    
+    </script>
+
+</head>
+<body>
+	
+	<div id="fen3a3_container" class="tab-con">
+
+		<div id="ye_1_blank" ></div>
+		<div id="ye_2_blank" ></div>
+
+		<div id="ye_3_text_container" >
+			<div id="header_1" >
+            <h2 >部门管理</h2></div>
+            <!-- 留空开始 -->
+	    	<div style="background-color:#FFFFFF;width:500px;height: 30px;float:left;box-sizing:border-box; position: relative;z-index: 999;">
+                <button id="opener" class="btn-class">编辑</button>
+			    <button id="delbut" class="btn-class">删除</button>
+	    	</div>
+			<!-- 留空结束 -->
+			<!-- 留空开始 -->
+			<div style="background-color:#FFFFFF;width:940px;height: 10px;float:left;box-sizing:border-box;">
+	    	</div>
+	    	<!-- 留空结束 -->
+	    	
+                    <!--start div id="listTable" 列表展示开始 -->
+            		<div id="listTable" >
+                    <table id="example" class="display tab-mians" cellspacing="0" width="100%">
+                        <thead class="tab-tit">
+                            <tr>
+                                <th style="min-width:140px;">名称</th>
+                                <!--<th style="min-width:140px;">校区</th>-->
+                                <th style="min-width:140px;">备注</th>
+                                <th style="min-width:140px;">状态</th>
+                            </tr>
+                        </thead>
+                        <tfoot class="tab-tit">
+                            <tr>
+                                <th style="min-width:140px;">名称</th>
+                                <!--<th style="min-width:140px;">校区</th>-->
+                                <th style="min-width:140px;">备注</th>
+                                <th style="min-width:140px;">状态</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    </div><!--end div id="listTable" 列表展示结束 -->
+
+		</div><!-- end div id="ye_3_text_container" -->
+
+	</div><!-- end div  id="fen3a3_container"-->
+
+    <div id="dialog"style="width:800px;height: 460px;padding-left: 20px;display:none;">
+                <!--<p>这是一个动画显示的对话框</p>-->
+                <form id="ff" name="ffname" method="post" > 
+
+                <table id="header_3_tb1" class="tab-style">
+                    <!-- 第一行 -->
+                    <tr>
+                    <td class="name-s" style="padding-left:0">部门名称</td>
+                    <td><input  type="text" name="name" class="yzss" value="请输入教室名称"> </td>
+                    </tr>
+                    <!-- 第一行结束 -->
+                    </table><!-- end id=header_3_tb1 -->
+
+                  <!--  <table id="header_3_tb2" class="tab-style">
+                    &lt;!&ndash; 第一行 &ndash;&gt;
+                    <tr>
+                    <td class="name-s" style="padding-left:0">所属校区</td>
+                    <td>
+                        <select  name="campus" class="yzss sel_s">
+                            <option value="所有校区">所有校区</option>
+                            <option value="企业公馆校区">企业公馆校区</option>
+                        </select>
+                    </td>
+                    </tr>
+                    &lt;!&ndash; 第一行结束 &ndash;&gt;
+
+                    </table>--> <!-- end id为 header_3_tb2 -->
+                    <table id="header_3_tb4" class="tab-style">
+                    <!-- 第一行 -->
+                    <tr>
+                    <td class="name-s" style="padding-left:0">备&nbsp;&nbsp;&nbsp;&nbsp;注</td>
+                    <td><input  type="text" name="remark" class="yzss" style="width: 655px;" value="最多可输入50个字符"></td>
+                    </tr>
+                    <!-- 第一行结束 -->
+
+                    </table> <!-- end id为 header_3_tb4 -->
+                </form>
+                <!-- 按钮div开始 -->
+                <div class="btn-box" style="margin-right: 20px;">
+                    <button  class="easyui-linkbutton btn-xk" id="close">关闭</button>
+                    <button  class="easyui-linkbutton btn-qr" id="submitForm">确认</button>
+                 </div>
+                 <!-- 按钮div结束 -->
+    </div><!-- end id=dialog -->
+    <!-- S--公用弹窗 -->
+    <div class="alert-main">
+        <p class="alert-con">此条学生信息已删除</p>
+        <a class="close-item">×</a>
+    </div>
+    <script>
+        $(function () {
+            $('.close-item').click(function(){
+                $('.alert-main').hide()
+            })
+        })
+    </script>
+    <!-- E--公用弹窗 -->
+</body>
+</html>

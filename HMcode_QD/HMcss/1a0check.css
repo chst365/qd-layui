@@ -1,0 +1,365 @@
+@charset "utf-8";
+*{
+    margin:0;
+    padding:0;
+    font-family: "黑体";
+}
+
+/*最外面的tab样式*/
+.tab-con{
+    min-width: 1100px;
+    height: 850px;
+    padding:40px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: white;
+}
+#header_1 h2{
+    font-size: 18px;
+    color:#737373;
+    font-weight: 600;
+    line-height: 16px;
+}
+/*按钮样式*/
+.btn-class{
+    color:white;
+    background-color: #36cb91;
+    border:none;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+    line-height: 30px;
+    padding:0 15px;
+    font-size:14px;
+}
+#example_length{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    color:#999999;
+}
+#example_length select{
+    width:90px;
+    line-height: 36px;
+    height: 36px;
+    border:1px solid #d9d9d9;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    appearance:none;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    font-size:16px;
+    padding-right: 35px;
+    text-align: center;
+    color:#999;
+    background:url(../HMimages/arrow.jpg) no-repeat scroll right center transparent;
+}
+#example_filter{
+    color:#d7d7d7;
+    margin-top:30px;
+    margin-bottom: 20px;
+}
+#example_filter input{
+    width:230px;
+    height:36px;
+    border:1px solid #d9d9d9;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding:0 15px;
+    font-size:16px;
+    color:#d7d7d7;
+    padding-right: 30px;
+    background: url(../HMimages/icon-search.jpg) no-repeat scroll 200px center transparent;
+}
+/*表格主体*/
+.tab-mians{
+    max-height:550px;
+    width:1020px;
+    font-size:16px;
+    font-weight: normal;
+    color:#808080;
+    clear: both;
+}
+.tab-tit>tr{
+    background-color: #e9edf1;
+}
+table.dataTable thead th, table.dataTable thead td ,table.dataTable tfoot th, table.dataTable tfoot td{
+    padding:0;
+    border:none;
+    color:#4c4c4c;
+    line-height: 50px;
+    font-weight: normal;
+}
+table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1{
+    background: transparent;
+}
+table.dataTable.display tbody tr.odd{
+    background-color: #fcfcfc;
+}
+table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td{
+    padding:0;
+}
+table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td{
+    border:none;
+    border-bottom: 1px solid #e7e7e7;
+}
+table.dataTable tbody tr {
+    background-color: #ffffff;
+    height: 49px;
+    text-align: center;
+}
+table.dataTable tbody td{
+    padding:0;
+}
+table.dataTable.row-border tbody tr:first-child th, table.dataTable.row-border tbody tr:first-child td, table.dataTable.display tbody tr:first-child th, table.dataTable.display tbody tr:first-child td ,table.dataTable.display tbody tr.odd, table.dataTable.display tbody tr.even{
+    padding:0;
+    line-height:44px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color:#808080;
+}
+
+.tab-body{
+    background-color: #fcfcfc;
+    line-height: 50px;
+}
+tbody tr:hover{
+    background-color: #fafdff;
+}
+.tab-body tr{
+    border-bottom: 1px solid #e7e7e7;
+}
+
+/* 最后一行样式 */
+.dataTables_wrapper .dataTables_info{
+    color:#999;
+    margin-top:30px;
+    line-height: 30px;
+}
+/* 翻页 */
+.dataTables_wrapper .dataTables_paginate{
+    margin-top:30px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+    font-size:14px;
+    padding:4px 9px;
+    background-color: #fafafa;
+    border:none;
+    color:#6a6a6a;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+    font-size:14px;
+    padding:4px 9px;
+    background: #fafafa;
+    border:none;
+    color:#5bc159 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+    font-size:14px;
+    padding:4px 9px;
+    background: #fafafa;
+    border:none;
+    color:#5bc159 !important;
+}
+
+/* 公用弹窗样式 */
+.alert-main{
+    width:400px;
+    position:absolute;
+    top: 5px;
+    left:50%;
+    margin-left:-200px;
+    line-height: 34px;
+    padding:10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    -moz-box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    z-index: 999;
+    display: none;
+}
+.alert-main p{
+    position: relative;
+    text-align: center;
+    color:#ff2f2f;
+    font-size:16px;
+    line-height:24px;
+}
+.alert-main .close-item{
+    position: absolute;
+    right:0;
+    top: -5px;
+    cursor: pointer;
+    font-size:20px;
+    color:#868686;
+}
+
+
+/* 编辑弹窗 */
+/* 弹窗头部样式修改 */
+.panel-title {
+    font-size: 20px;
+    padding-left:10px;
+    font-weight: normal;
+    color: #575765;
+    height: 30px;
+    line-height: 30px;
+
+}
+/* tab标签 */
+.tab-style{
+    clear: both;
+    font-size:16px;
+}
+.tab-style tr{
+    display: block;
+    margin-top:20px;
+}
+.yzss{
+    width:200px;
+    height:36px;
+    line-height: 34px;
+    border:1px solid #d9d9d9;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size:16px;
+    color:#646464;
+    padding-left:10px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+}
+.sel_s{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color:#828282;
+    background:url(../HMimages/arrow.jpg) no-repeat scroll right center transparent;
+}
+.combo{
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+    padding-left:10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.validatebox-invalid{
+    background-color: transparent;
+}
+.combo .combo-text{
+    font-size:16px;
+    color:#646464;
+    line-height: 34px;
+}
+.datebox .combo-arrow{
+    padding-top:10px;
+}
+.name-s{
+    padding-right:20px;
+    color:#4c4c4c;
+    padding-left:80px;
+}
+.tit_style h3{
+    font-size: 16px;
+    color:#18be76;
+    padding-bottom:10px;
+    font-weight: normal;
+    line-height: 16px;
+}
+/*按钮样式*/
+.btn-box{
+    clear:both;
+    text-align: right;
+    margin-top:50px;
+    float: right;
+}
+.btn-box .btn-xk{
+    font-size:16px;
+    color:#4c4c4c;
+    padding:0 20px;
+    border:none;
+    margin:0;
+    background: none;
+    line-height: 36px;
+    background-color: #d9d9d9;
+    -webkit-border-radius:5px;;
+    -moz-border-radius:5px;;
+    border-radius:5px;
+}
+.btn-box .btn-qr{
+    font-size:16px;
+    color:white;
+    padding:0 20px;
+    background: none;
+    background-color: #3ccb93;
+    line-height: 36px;
+    border:none;
+    margin:0;
+    margin-left:20px;
+    -webkit-border-radius:5px;;
+    -moz-border-radius:5px;;
+    border-radius:5px;
+}
+.btn-box .btn-qr:hover{
+    background-color:#3ed79c;
+}
+.btn-box .btn-xk:hover{
+    background-color:#e4e4e4;
+}
+.l-btn-text{
+    font-size:16px;
+    line-height: 36px;
+}
+.del-btn{
+    background-color: #ff4949
+}
+/*  弹窗 */
+
+/* 鼠标经过btn按钮样式改变 */
+.btn-class:hover ,.btn-box .btn-xk:hover ,.btn-box .btn-qr:hover ,.del-btn:hover{
+    background-color: #999;
+    color:#f2f2f2;
+}
+
+.numberbox,.easyui-textbox{
+    line-height:34px;
+    border-radius:5px;
+    text-align: center;
+    border:1px solid #ccc;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#phone_num tr,#wei_num tr{
+    display:block;
+    margin-top:20px;
+}
+#phone_num td,#wei_num td{
+    padding-right:10px;
+}
+
+
+
+

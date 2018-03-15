@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>新增渠道</title>
+	
+	<!-- <script type="text/javascript" src="../xppjs/jquery.js"></script> -->
+	<script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+	<script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+	<script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+	<script src="../js/layer.js"></script>
+	<link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+	<link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+	<link rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/QD_1a1.css">
+	<style>
+		.dataTables_wrapper{
+			margin-top:-67px;
+		}
+		.name-s{
+			width:80px;
+		}
+		.combo-arrow{
+			background-image:url('../HMcode_QD/HMimages/arrow.jpg');
+			background-color: transparent;
+		}
+		.combobox-item {
+			font-size: 16px;
+			color: #646464;
+			padding-left: 10px;
+		}
+	</style>
+	<script>
+      var NameOfCookie="rsList";
+      var c = document.cookie.indexOf(NameOfCookie+"=");
+      if (c != -1)
+      {
+        console.log("第一次js检测已经登陆");
+      }
+      else
+      {
+        layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+          window.location.href="../login.html";
+        });
+      }
+      $(document).ready(function() {
+        var NameOfCookie = "rsList";
+        var c = document.cookie.indexOf(NameOfCookie + "=");
+        // alert(c);
+        if (c != -1) {
+          //判断已经退出登陆
+          if ($.cookie("rsList") == "") {
+            console.log("检测没有权限，重新登录或联系管理员");
+            window.location.href = "../login.html";
+          }
+          console.log("jquery里检测已经登陆");
+        }
+        else {
+          console.log("jquery里检测没有登陆");
+          window.location.href = "../login.html";
+        }
+      })
+		var Conuuid;
+		//验证所有类名yzss输入框
+			function yzV1(){
+			var m = {};
+			// m=document.getElementsByTagName("input");
+			m=document.getElementsByClassName("yz-box");
+
+			for(var i=0;i<m.length;i++)
+			{
+					if(m[i].value==""||m[i].value==null)
+					{
+//						alert("请填写所有输入框的值"+m[i].id);
+                      layer.alert("请填写所有输入框的值"+m[i].id,{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+                      return false;
+					}
+			}//end for
+			console.log("合同前两行输入框验证，有值！！");
+			return true;
+
+		}
+		/*获取负责人下拉框内容*/
+		var sendData = {};
+		$.ajax({
+			url:"/QDcrm/aaEmp?qqiu=list",
+			Type:"GET",
+			contentTypt:"application/json;charset=UTF-8",
+			data:JSON.stringify(sendData),
+			success:function(msg){
+				xiala(msg);
+			}
+		});
+		function xiala(msg) {
+			var obj = {};
+            obj = JSON.parse(msg);
+            var objData = obj.data;
+            $('#empUuid').combobox({
+                data: objData,
+                valueField: 'uuid',
+                textField: 'name',
+                selectOnNavigation: false
+			});
+            $('#empUuid').combobox('setValue',$.cookie('ckUserEmpUuid'));
+        }
+		function submitForm(){
+			var f1=yzV1();
+			var weixin = $("#weixin").val();
+			var phone = $('#phone').val();
+			if((weixin == ""||weixin == null)&&(phone == ""||phone == null)){
+//			    alert("请输入微信号或手机号");
+                layer.alert("请输入微信号或手机号",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+			    return false;
+			}else if((weixin == ""||weixin == null)&&(phone !== ""&&phone !== null)){
+                $("#weixin").val("无");
+			}else {
+                $('#phone').val("无");
+			}
+            var sel = $('#empUuid').combobox("getValue");
+            if(sel=="请选择渠道负责人" || sel == "" || sel == null){
+//                alert("请选择渠道负责人");
+                layer.alert("请选择渠道负责人",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+                return false;
+            }
+			var flag = false;
+			if(f1==true){flag = true;}
+			if (flag) {
+			//$('#ff').form('submit');
+			var param = $("#ff").serializeObject();
+			param.userUuid = $.cookie("ckUserEmpUuid");
+			param.userName = $.cookie("ckUserName");
+			console.log(param);
+			$.ajax({
+				url:"/QDcrm/aaDitch?qqiu=add",
+				type: "POST",
+				//data: JSON.stringify(param),
+				data: JSON.stringify(param),
+				contentType: "application/json;charset=UTF-8", 
+				success:function(result){
+				var obj = JSON.parse(result);
+//				alert(obj.message);
+				var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+				var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+				layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(){
+				  Conuuid = $.cookie("ck_ditchUuid",obj.data);
+                  //调用父级弹窗start
+                  window.location.href="QD_1a1_gx1.html";
+				});
+				}
+			 
+			});//end 结束ajax
+		}//end if(flag)
+		};//end function submitForm
+
+		function clearForm(){
+			$('#ff').form('clear');
+		};//end function clearForm
+
+
+	</script>
+</head>
+<body>
+	
+	<div id="fen_container" class="tab-con">
+
+		<div id="ye_3_text_container">
+			<div id="header_1">
+            	<h2>新增渠道</h2>
+			</div>
+            <div id="header_2" class="tit_style">
+            	<h3>基础信息</h3>
+			</div>
+
+            <div id="header_3_form">
+            	<form id="ff" method="post" > 
+            		<table class="tab-style">
+            		<!-- 第一行 -->
+            		<tr>
+	    			<td class="name-s" style="padding-left:0">姓名</td>
+	    			<td><input  type="text" name="name" class="yz-box yzss" placeholder="请输入姓名"></input></td>
+	    			<td class="name-s">性别</td>
+	    			<td>
+		    			<select  name="sex" class="yz-box yzss sel_s">
+							<option value="男">男</option>
+							<option value="女">女</option>
+						</select>
+	    			</td>
+	    			<td class="name-s">手机</td>
+	    			<td><input  type="text" name="phone" id="phone" class="yzss" placeholder="请输入电话号码"></input></td>
+	    			</tr>
+	    			<!-- 第一行结束 -->
+	    			<!-- 第二行 -->
+            		<tr>
+	    			<td class="name-s" style="padding-left:0">微信</td>
+	    			<td>
+						<input  type="text" id="weixin" name="weixin" class="yzss" placeholder="请输入微信号"></input>
+	    			</td>
+	    			<td class="name-s">单位</td>
+	    			<td><input  type="text" name="company" class="yz-box yzss" placeholder="请输入所在单位"></input></td>
+					<td class="name-s">职位</td>
+					<td><input  type="text" name="job" class="yz-box yzss" placeholder="请输入职位信息"></input></td>
+	    		
+	    			</tr>
+	    			<!-- 第二行结束 -->
+            		</table>
+
+            		<div class="tit_style">
+						<h3>其他信息</h3>
+					</div>
+
+            		<table class="tab-style">
+            		<!-- 第一行 -->
+            		<tr>
+	    			<td class="name-s" style="padding:0;width:58px;">负责人</td>
+	    			<td style="margin-left:20px;">
+						<input id="empUuid" name="empUuid" data-options="editable:true" class="easyui-combobox yzss" style="width: 200px; height: 36px; color:#646464; display: none;" comboname="empUuid">
+					</td>
+						<td class="name-s" style="padding-right: 0;padding-left:95px; ">渠道等级</td>
+						<td style="margin-left:20px;">
+							<select  name="rank" class="yz-box yzss sel_s">
+								<option>A</option>
+								<option>B</option>
+								<option>C</option>
+								<option>D</option>
+							</select>
+						</td>
+						<td class="name-s" style="padding-right: 0;padding-left:95px; ">佣金比例</td>
+						<td style="margin-left:20px;">
+							<input type="text" style="height: 36px;" name="moneyRate" id="moneyRate" class="easyui-numberbox yzss yz-box"  placeholder="请输入佣金">
+						</td>
+	    			</tr>
+	    			<!-- 第一行结束 -->
+	    		</table>
+
+	    		<table class="tab-style">
+					<tr>
+						<td class="name-s" style="padding-left:0">来源</td>
+						<td><input  type="text" name="source" class="yzss" style="width:955px;" placeholder="请输入渠道来源"></input></td>
+					</tr>
+            		<tr>
+	    			<td class="name-s" style="padding-left:0">备注</td>
+	    			<td><input  type="text" name="remark" class="yzss" style="width:955px;" value="无"></input></td>
+	    			</tr>
+	    			<!-- 第二行结束 -->
+            		</table>
+            	</form>
+            	<!-- 按钮div开始 -->
+            	<div class="btn-box" style="margin-right: 4px;">
+	    			<a href="javascript:void(0)" class="easyui-linkbutton btn-xk" onclick="clearForm()">清空</a>
+	    			<a href="javascript:void(0)" class="easyui-linkbutton btn-qr" onclick="submitForm()">下一步</a>
+	   			 </div>
+	   			 <!-- 按钮div结束 -->
+            </div><!-- end div  header_3_form-->
+
+		</div><!-- end div  ye_3_text_container-->
+
+
+	</div><!-- end div  id="fen_container"-->
+	<!-- S--公用弹窗 -->
+	<div class="alert-main">
+		<p class="alert-con">此条学生信息已删除</p>
+		<a class="close-item">×</a>
+	</div>
+	<script>
+        $(function () {
+            $('.close-item').click(function(){
+                $('.alert-main').hide()
+            });
+            <!--修改日期输入框样式-->
+            $(function(){
+                $('.combo .combo-text').css({
+                    "fontSize":"16px",
+                    "color":"#464646",
+					"paddingLeft":"10px",
+					"boxSizing":"border-box",
+                });
+                $('.combo').css("borderRadius","5px");
+            })
+        })
+	</script>
+	<!-- E--公用弹窗 -->
+</body>
+</html>

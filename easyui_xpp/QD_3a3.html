@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色新增</title>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+    <script type="text/javascript" src="DataTables/datatables.js"></script>
+    <script src="../js/layer.js"></script>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/datatables.css"/>
+    <link  rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/3a3.css"/>
+</head>
+<body>
+<div class="tab-con">
+    <div id="header_1" >
+        <h2>角色新增</h2>
+    </div>
+    <!--S--表格开始 -->
+    <form id="count-tab">
+        <ul class="tab-style">
+            <li class="fir"><i class="name-s">输入角色</i><input type="text" id="name" class="yzss" placeholder="请输入角色"></li>
+            <li><i class="name-s">备注信息</i><input style="width:569px;" id="remark" type="text" class="yzss" value="无"></li>
+        </ul>
+    </form>
+    <!--E--表格结束 -->
+    <!--S--资源表-->
+    <div class="box_zyb">
+        <p>资&nbsp;源&nbsp;表</p>
+        <!--easyui树的引用-->
+        <ul id="tree" class="easyui-tree" data-options="url:'tree_roleRS.json',method:'get',animate:true,checkbox:true">
+
+        </ul>
+    </div>
+    <!--E--资源表-->
+    <div class="btn-box">
+       <!-- <button  class="easyui-linkbutton btn-xk" id="clearAll">清空</button>-->
+        <button  class="easyui-linkbutton btn-qr" id="submit">确认</button>
+    </div>
+</div>
+</body>
+<script>
+  var NameOfCookie="rsList";
+  var c = document.cookie.indexOf(NameOfCookie+"=");
+  if (c != -1)
+  {
+    console.log("第一次js检测已经登陆");
+  }
+  else
+  {
+    layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+      window.location.href="../login.html";
+    });
+  }
+    $(document).ready(function(){
+          var NameOfCookie = "rsList";
+          var c = document.cookie.indexOf(NameOfCookie + "=");
+          // alert(c);
+          if (c != -1) {
+            //判断已经退出登陆
+            if ($.cookie("rsList") == "") {
+              console.log("检测没有权限，重新登录或联系管理员");
+              window.location.href = "../login.html";
+            }
+            console.log("jquery里检测已经登陆");
+          }
+          else {
+            console.log("jquery里检测没有登陆");
+            window.location.href = "../login.html";
+          }
+        $("#submit").click(function() {
+            var send_data = {};
+            //获取角色
+            var name = $('#name').val();
+            var noteInfo = $('#remark').val();
+            send_data.name = name;
+            send_data.remark = noteInfo;
+            if(send_data.name =="" ||send_data.name ==null ){
+                layer.alert("请输入角色",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5});
+                return false;
+            }
+            if(send_data.remark =="" ||send_data.remark ==null ){
+                layer.alert("请输入备注",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5});
+                return false;
+            }
+
+            var treeNodes = $("#tree").tree('getChecked');//获取已选中的元素
+            var treeNode = $("#tree").tree('getChecked','indeterminate');//获取已选中的元素
+            var treeCount=[];//存储已选元素的id
+            for(var i=0;i<treeNodes.length;i++){
+                treeCount.push(treeNodes[i].id);
+            }
+            for(var i=0;i<treeNode.length;i++){
+                treeCount.push(treeNode[i].id);
+            }
+            send_data.rsList = treeCount;
+              if(send_data.rsList =="" ||send_data.rsList ==null ){
+                layer.alert("请勾选权限",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5});
+                return false;
+              }
+            console.log(send_data);
+            $.ajax({
+                url:"/QDcrm/aaRole?qqiu=add",
+                type: "POST",
+                data: JSON.stringify(send_data),
+                contentType: "application/json;charset=UTF-8",
+                success:function(result){
+                    var obj = JSON.parse(result);
+                    var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+                    var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+                    layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(){
+                        var $parent = self.parent.$;
+                        $parent('#menu_c4').click();
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+</html>

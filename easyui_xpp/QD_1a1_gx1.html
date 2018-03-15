@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加跟进记录</title>
+    
+    <!-- <link rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/> -->
+   <!--  <link rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/> -->
+    
+    
+    
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+    <script src="../js/layer.js"></script>
+    <link rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/1a1_gx1.css">
+    <script>
+     var NameOfCookie="rsList";
+     var c = document.cookie.indexOf(NameOfCookie+"=");
+     if (c != -1)
+     {
+       console.log("第一次js检测已经登陆");
+     }
+     else
+     {
+       layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+         window.location.href="../login.html";
+       });
+     }
+        $(document).ready(function(){
+          var NameOfCookie = "rsList";
+          var c = document.cookie.indexOf(NameOfCookie + "=");
+          // alert(c);
+          if (c != -1) {
+            //判断已经退出登陆
+            if ($.cookie("rsList") == "") {
+              console.log("检测没有权限，重新登录或联系管理员");
+              window.location.href = "../login.html";
+            }
+            console.log("jquery里检测已经登陆");
+          }
+          else {
+            console.log("jquery里检测没有登陆");
+            window.location.href = "../login.html";
+          }
+          //laydatetime
+          laydate.render({
+            elem: '#recordDate', //指定元素
+            type: 'datetime',
+            value: new Date()
+          });
+        //验证所有类名yzss输入框
+        function yzV1() {
+            
+            var R = document.getElementById("remarkText").value==''?false:true;
+            var T = $('#recordDate').val()==''?false:true;
+            if(!T){
+              layer.alert("请选择跟进日期",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(!R){
+              layer.alert("请填写备注",{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:0});
+            }
+            if(R&&T){
+               console.log("有值,可以提交"); 
+               return true;
+            }else{
+               return false;
+            }
+        };
+
+
+        $('#submitForm').click(function(){
+             
+            var flag = yzV1();
+            if(flag){
+                var param = $("#ff").serializeObject();
+                param.ditchUuid = $.cookie('ck_ditchUuid');
+                param.userUuid = $.cookie("ckUserEmpUuid");
+                param.userName = $.cookie("ckUserName");
+                console.log(param);
+                $.ajax({
+                    url: "/QDcrm/aaRecord?qqiu=add",
+                    type: "POST",
+                    data: JSON.stringify(param),
+                    contentType: "application/json;charset=UTF-8",
+                    success: function (result) {
+                      var obj = JSON.parse(result);
+                      var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+                      var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+                      layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:j,icon:i}, function(){
+                        obj.message == '新增成功'?window.location.href="QD_1a3.html":window.location.href="QD_1a1_gx1.html";
+                        //调用父级弹窗start
+                        var $parent = self.parent.$;
+                        $parent('#menu_a3').click();
+                        //调用父级弹窗end
+                      });
+
+                    }
+                }); 
+            }
+        });//end function submitForm
+
+        $('#clearForm').click(function(){
+            $('#ff').form('clear');
+        });//end function clearForm
+
+//            给日历一个默认的时间
+            $(function(){
+                var curr_time = new Date();
+                var strDate = curr_time.getFullYear()+"-";
+                strDate += curr_time.getMonth()+1+"-";
+                strDate += curr_time.getDate()+" ";
+                strDate += curr_time.getHours()+":";
+                strDate += curr_time.getMinutes()+":";
+                strDate += curr_time.getSeconds();
+                console.log(strDate);
+                $("#recordDate").datetimebox("setValue", strDate);
+            });
+
+});
+    </script> 
+</head>
+<body style="background-color: white">
+
+<div id="fen_container" class="tab-con">
+    <div id="ye_3_text_container">
+        <div id="header_1">
+            <h2>添加跟进记录</h2>
+            <div id="litle_a5" class="tit-btn">
+                <a class="return-link" href="javascript:window.location.href='QD_1a1.html';">返回上一页</a>
+            </div>
+        </div>
+        <div id="header_3_form">
+            <form id="ff" method="post">
+                <div id="header_3_tb1" class="tab-style"style="width:100%;">
+
+                    <!-- 第一行 -->
+                    <div style="margin:20px 0 ;">
+                        跟进时间
+                        <input id="recordDate" name="recordDate" class="yzss "required="required">
+                    </div>
+                    <!-- 第一行结束 -->
+                     <div style="margin-bottom:20px;">
+                         <textarea id="remarkText" name="remarkText" class="yzss" placeholder="请输入渠道的跟进记录" style="resize: none;height: 100px;"></textarea>
+                     </div>
+                        
+                    
+                </div>
+          
+
+            </form>
+            <!-- 按钮div开始 -->
+            <div class="btn-box" >
+                <a href="javascript:void(0)" class="easyui-linkbutton btn-xk" id="clearForm">清空</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton btn-qr" id="submitForm">确认</a>
+            </div>
+            <!-- 按钮div结束 -->
+        </div><!-- end div  header_3_form-->
+
+    </div><!-- end div  ye_3_text_container-->
+</div><!-- end div  id="fen_container"-->
+
+<!--修改日期输入框样式-->
+<script>
+    $(function(){
+        $('.combo').css({
+            "height":"34px",
+            "width":"200px"
+        });
+        $('.combo .combo-text').css({
+            "height":"34px",
+            "width":"160px"
+        });
+    });
+    var wHe = $('#header_1').width();
+    $('#remarkText').css("width",wHe);
+    $(window).resize(function (){
+        var wHe = $('#header_1').width();
+        $('#remarkText').css("width",wHe);
+    });
+
+</script>
+<!-- E--公用弹窗 -->
+</body>
+</html>

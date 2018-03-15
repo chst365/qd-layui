@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的渠道</title>
+
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="DataTables/datatables.js"></script>
+    <script type="text/javascript" src="DataTables/Buttons-1.4.2/js/dataTables.buttons.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+    <script src="../js/layer.js"></script>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/datatables.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/Buttons-1.4.2/css/buttons.dataTables.css"/>
+    <link   rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/QD_1a2.css"/>
+
+
+
+
+
+    <!-- <script src="../js/jquery-1.8.2.js" type="text/javascript"></script> -->
+    <style>
+        .dataTables_wrapper{
+            margin-top:-67px;
+        }
+        .dataTables_wrapper .dataTables_info{
+            clear: none;
+            float: right;
+            padding-right: 20px;
+            margin-top:20px;
+        }
+        .dataTables_wrapper .dataTables_paginate{
+            float: right;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            border:1px solid transparent;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:active{
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            border:1px solid transparent;
+        }
+        table.dataTable.display tbody tr.even td.sorting_1{
+            background-color: white;
+        }
+    </style>
+
+    <script type="text/javascript">
+      var NameOfCookie="rsList";
+      var c = document.cookie.indexOf(NameOfCookie+"=");
+      if (c != -1)
+      {
+        console.log("第一次js检测已经登陆");
+      }
+      else
+      {
+        layer.alert('没有登录',{skin:'layui-layer-molv',closeBtn:1,anim:6,icon:5}, function(){
+          window.location.href="../login.html";
+        });
+      }
+        $(document).ready(function() {
+          var index;
+          var NameOfCookie = "rsList";
+          var c = document.cookie.indexOf(NameOfCookie + "=");
+          // alert(c);
+          if (c != -1) {
+            //判断已经退出登陆
+            if ($.cookie("rsList") == "") {
+              console.log("检测没有权限，重新登录或联系管理员");
+              window.location.href = "../login.html";
+            }
+            console.log("jquery里检测已经登陆");
+          }
+          else {
+            console.log("jquery里检测没有登陆");
+            window.location.href = "../login.html";
+          }
+
+            //按钮权限开始
+            function funBtn(){
+                $( "#delbut" ).hide();
+                $( "#opener" ).hide();
+                $( "#genjin" ).hide();
+                var viewArr = $.cookie("rsList").split(",");
+                for (var i = 0; i < viewArr.length; i++) {
+                  if(viewArr[i]=="Ac1") {$( "#opener" ).show();}
+                  if(viewArr[i]=="Ac2") {$( "#genjin" ).show();}
+                  if(viewArr[i]=="Ac3") {$( "#delbut" ).show();}
+                }//end for
+            }
+            funBtn();
+            // layer编辑弹窗
+            function editWin(){
+                index = layer.open({
+                    type: 1,
+                    title:'编辑',
+                    closeBtn: 1,
+                    area: ['970px', ''],
+                    content: $('#dialog')       
+                });
+            }
+            /*第零步：把datatables插件的警告窗变成控制台打印*/
+            $.fn.dataTable.ext.errMode = 'none';
+
+            /*获取负责人下拉框内容*/
+            var sendData = {};
+            $.ajax({
+                url:"/QDcrm/aaEmp?qqiu=list",
+                Type:"GET",
+                contentTypt:"application/json;charset=UTF-8",
+                data:JSON.stringify(sendData),
+                success:function(msg){
+                    xiala(msg);
+                }
+            });
+            function xiala(msg) {
+                var obj = {};
+                obj = JSON.parse(msg);
+                var objData = obj.data;
+                var html = '';
+                for(var i=0;i<objData.length;i++){
+                    html+='<option value='+objData[i].uuid+'>'+objData[i].name+'</option>'
+                }
+                $('#empUuid').append(html);
+            }
+
+            //取出登陆时存的cookie
+            var UserCookie = {};
+            UserCookie.empUuid = $.cookie('ckUserEmpUuid');
+            console.log("取出登陆时存的cookie"+UserCookie.empUuid);
+            var aUrl = "/QDcrm/aaMyDitch?qqiu=list&&empUuid="+UserCookie.empUuid;
+            console.log("转化后的地址"+ aUrl);
+          //步骤1,展示列表数据
+            //判断cookie是否存在
+            var NameOfCookie="ckUserEmpUuid";
+            var c = document.cookie.indexOf(NameOfCookie+"="); 
+                // alert(c);
+              if (c != -1)
+              {
+            console.log("检测cookie里存在ckUserEmpUuid");
+              }
+              else
+              {
+               console.log("检测cookie里不存在ckUserEmpUuid");
+//               alert("2a3.html检测cookie里不存在ckUserEmpUuid");
+              }
+            var tabShowText;
+            var table = $('#example').DataTable( {
+                "dom":'frtpi',
+                "bLengthChange":false,
+                bSort:true,
+                language: {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "共 _TOTAL_ 项",
+                    "sInfoEmpty": "共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                },//国际化语言结束
+                "ajax": aUrl,
+                "columns": [
+                    { "data": "name" },
+                    { "data": "empName" },
+                    { "data": "rank" },
+                    { "data": "moneyRate" },
+                    { "data": "company" },
+                    { "data": "job" },
+                    { "data": "weixin" },
+                    { "data": "phone" },
+                    {
+                        "data": null,
+                        "searchable": true,
+                        "title": "状态"
+                    }
+                    // { "data": "address" }
+                ],
+                "columnDefs":[{
+                    "targets": -1,
+                    "data": tabShowText,
+                    "name": "状态",
+                    "cellType": "th",
+                    "orderDataType": "dom-text",
+                    "orderSequence": [ "desc","asc", "asc" ],
+                    "className": "my_class",
+                    "contentPadding": "mmm",
+                    "createdCell": function (td, cellData, rowData, row, col) {
+//                        console.log( cellData.openAndclose);
+                        if ( cellData.openAndclose == 'open' ) {
+                            tabShowText = '已开启';
+                            $(td).context.innerHTML="<button style='color: white;border:none;border-radius: 5px;background-color: #36cb91;line-height: 30px;text-align: center;width: 100px;font-size: 14px;'>"+ tabShowText +"</button>";
+
+                        }else{
+                            tabShowText = '已关闭';
+                            $(td).context.innerHTML="<button style='color: white;border:none;border-radius: 5px;background-color: #ff4949;line-height: 30px;text-align: center;width: 100px;font-size: 14px;'>"+ tabShowText +"</button>";
+
+                        }
+                    }
+                }]
+            } );//end 外圈  $('#example').DataTable
+
+            $('#example tbody').on( 'click', 'button', function () {
+                var send_data = {};
+                send_data.uuid = table.row( $(this).parents('tr') ).data().uuid;
+                table.row( $(this).parents('tr') ).data().openAndclose == 'open'?send_data.openAndclose = 'close':send_data.openAndclose = 'open';
+                $.ajax({
+                    url:"/QDcrm/aaDitch?qqiu=on_off",
+                    type: "POST",
+                    //data: JSON.stringify(param),
+                    data: JSON.stringify(send_data),
+                    contentType: "application/json;charset=UTF-8",
+                    success:function(result){
+                        var obj = JSON.parse(result);
+                        layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:1,anim:5,icon:1});
+                        table.row( $(this).parents('tr') ).ajax.reload();
+                    }
+
+                });//end $.ajax
+            } );//end 步骤1 外圈  $('#example').DataTable
+            //步骤2，列表选择
+            var selectTable = $('#example tbody').on( 'click', 'tr', function () {
+                if ( $(this).hasClass('selected') ) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }//end if
+
+            } );//end 外圈 $('#example tbody').on
+
+            //步骤3，删除按钮单击事件
+            $('#delbut').click( function () {
+
+                //要初始化一个对象，不然会报undifine未定义错误
+                var delRowData = {};
+                //获取选择那一行的数据
+                delRowData = table.row('.selected').data();
+                //获取选择行中的uuid字段
+                var Auuid = delRowData.uuid;
+
+                //post请求体传给后台的js对象
+                var send_data = {};
+                send_data.uuid = Auuid;
+                send_data.userUuid = $.cookie("ckUserEmpUuid");
+                send_data.userName = $.cookie("ckUserName");
+                // alert( "选择的行的uuid: "+send_data);
+                //调用ajax方法传给后台接口
+              layer.confirm('确定要删除?', {icon: 3, title:'提示'}, function(index){
+                $.ajax({
+
+                  url:"/QDcrm/aaDitch?qqiu=delete",
+                  type: "POST",
+                  //data: JSON.stringify(param),
+                  data: JSON.stringify(send_data),
+                  contentType: "application/json;charset=UTF-8",
+                  success:function(result){
+                    layer.alert(JSON.parse(result).message,{skin:'layui-layer-molv',closeBtn:1,anim:5,icon:1});
+                      /*window.location.reload();*/
+
+                  }
+
+                });//end $.ajax
+                  /* 弹窗事件 */
+                table.row('.selected').remove().draw( false );//图形删除，没有传到后台接口
+
+                layer.close(index);
+              });
+            } );//end 外圈 $('#delbut').click
+            //步骤5，编辑打开事件
+            $( "#opener" ).click(function() {
+
+                //要初始化一个对象，不然会报undifine未定义错误
+                var delRowData = {};
+                //获取选择那一行的数据
+                delRowData = table.row('.selected').data();
+                console.log(delRowData.moneyRate);
+                document.ffname2a2.name.value= delRowData.name;
+                document.ffname2a2.sex.value= delRowData.sex;
+                document.ffname2a2.weixin.value= delRowData.weixin;
+                document.ffname2a2.phone.value= delRowData.phone;
+                document.ffname2a2.company.value= delRowData.company;
+                $('#moneyRate').numberbox('setValue',delRowData.moneyRate);
+                document.ffname2a2.job.value= delRowData.job;
+                document.ffname2a2.empUuid.value= delRowData.empUuid;
+                // $('#empUuid').combobox("setValue",delRowData.empUuid);
+                document.ffname2a2.rank.value= delRowData.rank;
+                document.ffname2a2.source.value= delRowData.source;
+                document.ffname2a2.remark.value= delRowData.remark;
+                editWin();
+                $.cookie('ck_uuid_ditch', delRowData.uuid);//uuid
+                $.cookie('ck_name', delRowData.name);//姓名
+                $.cookie('ck_phone', delRowData.phone);//电话
+                $.cookie('ck_weixin', delRowData.weixin);//微信
+                $.cookie('ck_empName', delRowData.empName);//负责人
+                $.cookie('ck_rank', delRowData.rank);//等级
+                $.cookie('ck_company', delRowData.company);//单位
+                $.cookie('ck_job', delRowData.job);//工作
+                console.log($.cookie());
+
+
+            });//end opener 结束打开对话框
+
+            $( "#submitForm" ).click(function() {
+                //要初始化一个对象，不然会报undifine未定义错误
+                var delRowData = {};
+                //获取选择那一行的数据
+                delRowData = table.row('.selected').data();
+                // var param = $("#ff").serializeObject();
+                var send_edit_data = {};
+                send_edit_data = $("#ffname2a2").serializeObject();
+                send_edit_data.uuid = delRowData.uuid;
+                send_edit_data.userUuid = $.cookie("ckUserEmpUuid");
+                send_edit_data.userName = $.cookie("ckUserName");
+                $.ajax({
+                    url:"/QDcrm/aaDitch?qqiu=edit",
+                    type: "POST",
+                    //data: JSON.stringify(param),
+                    data: JSON.stringify(send_edit_data),
+                    contentType: "application/json;charset=UTF-8",
+                    success:function(result){
+                        var obj = JSON.parse(result);
+                        var i = obj.message.indexOf('重复')==-1 ? 1 : 2;
+                        var j = obj.message.indexOf('重复')==-1 ? 5 : 6;
+                        layer.alert(obj.message,{skin:'layui-layer-molv',closeBtn:0,anim:j,icon:i}, function(indexone){
+                              layer.close(indexone);
+                              if(obj.message.indexOf('重复')==-1){
+                                layer.close(index);
+                                table.ajax.reload();
+                              }
+                            });
+                    }
+                });
+
+
+            });//end submitForm
+            /*渠道链接跳转*/
+            $('#genjin').click(function(){
+                var delRowData = {};
+                delRowData = table.row('.selected').data();
+                $.cookie('ck_uuid_ditch', delRowData.uuid);//uuid
+                $.cookie('ck_name', delRowData.name);//姓名
+                $.cookie('ck_phone', delRowData.phone);//电话
+                $.cookie('ck_weixin', delRowData.weixin);//微信
+                $.cookie('ck_empName', delRowData.empName);//负责人
+                $.cookie('ck_rank', delRowData.rank);//等级
+                $.cookie('ck_company', delRowData.company);//单位
+                $.cookie('ck_job', delRowData.job);//工作
+                console.log($.cookie());
+                window.location.href="QD_1a2_gx1.html";
+            });
+            //步骤7，关闭修改对话框
+            $( "#close" ).click(function() {
+               layer.close(index);
+            });//end 7 外圈 close
+
+
+
+
+
+        } );//end 最外层 $(document).ready
+
+
+    </script>
+</head>
+<body>
+
+<div id="fen3a3_container" class="tab-con">
+    <div id="ye_1_blank"></div>
+    <div id="ye_2_blank"></div>
+    <div id="ye_3_text_container">
+        <div id="header_1">
+            <h2>我的渠道</h2>
+        </div>
+        <div style="position: relative;z-index: 999;width:500px;">
+            <button id="opener" class="btn-class">编辑</button>
+            <button id="genjin" class="btn-class">渠道跟进</button>
+            <button id="delbut" class="btn-class">删除</button>
+        </div>
+        <!--start div id="listTable" 列表展示开始 -->
+        <div id="listTable">
+            <table id="example" class="display tab-mians" cellspacing="0" width="100%">
+                <thead class="tab-tit">
+                <tr>
+                    <th>姓名</th>
+                    <th>负责人</th>
+                    <th>渠道等级</th>
+                    <th>佣金比例</th>
+                    <th>单位</th>
+                    <th>职位</th>
+                    <th>微信号</th>
+                    <th>手机号</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody class="tab-body">
+                </tbody>
+                <tfoot class="tab-tit">
+                <tr>
+                    <th>姓名</th>
+                    <th>负责人</th>
+                    <th>渠道等级</th>
+                    <th>佣金比例</th>
+                    <th>单位</th>
+                    <th>职位</th>
+                    <th>微信号</th>
+                    <th>手机号</th>
+                    <th>状态</th>
+                </tr>
+                </tfoot>
+            </table>
+
+        </div><!--end div id="listTable" 列表展示结束 -->
+
+
+
+
+
+    </div><!-- end div id="ye_3_text_container" -->
+
+</div><!-- end div  id="fen3a3_container"-->
+
+<div id="dialog"style="width:950px;height: 540px;padding-left:20px;display:none;">
+    <div  class="tit_style">
+        <h3>基础信息</h3>
+    </div>
+    <form id="ffname2a2" name="ffname2a2" method="post" >
+        <table class="tab-style">
+            <!-- 第一行 -->
+            <tr>
+                <td class="name-s" style="padding-left:0">姓名</td>
+                <td><input  type="text" name="name" class="yzss" placeholder="请输入姓名"></input></td>
+                <td class="name-s">性别</td>
+                <td>
+                    <select  name="sex" class="yzss sel_s">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </td>
+                <td class="name-s">手机</td>
+                <td><input  type="text" name="phone" class="yzss" placeholder="请输入电话号码"></input></td>
+            </tr>
+            <!-- 第一行结束 -->
+            <!-- 第二行 -->
+            <tr>
+                <td class="name-s" style="padding-left:0">微信</td>
+                <td>
+                    <input  type="text" name="weixin" class="yzss" placeholder="请输入学号"></input>
+                </td>
+                <td class="name-s">单位</td>
+                <td><input  type="text" name="company" class="yz-box yzss" placeholder="请输入是所在单位"></input></td>
+                <td class="name-s">职位</td>
+                <td><input  type="text" name="job" class="yz-box yzss" placeholder="请输入职位信息"></input></td>
+            </tr>
+            <!-- 第二行结束 -->
+        </table>
+
+        <div  class="tit_style">
+            <h3>其他信息</h3>
+        </div>
+
+        <table class="tab-style">
+            <!-- 第一行 -->
+            <tr>
+                <td class="name-s" style="padding:0;width:52px;">负责人</td>
+                <td style="margin-left:20px;">
+                    <!-- <input id="empUuid" name="empUuid" data-options="editable:true" class="easyui-combobox yzss" style="width: 200px; height: 36px; color:#646464; display: none;" value="请选择渠道负责人" comboname="empUuid"> -->
+                    <select name="empUuid" id="empUuid" class="yz-box yzss sel_s"></select>
+                </td>
+                <td class="name-s" style="padding-right: 0;padding-left:70px; ">渠道等级</td>
+                <td style="margin-left:20px;">
+                    <select  name="rank" class="yz-box yzss sel_s">
+                        <option>A</option>
+                        <option>B</option>
+                        <option>C</option>
+                        <option>D</option>
+                    </select>
+                </td>
+                <td class="name-s" style="padding-right: 0;padding-left:65px; ">佣金比例</td>
+                <td style="margin-left:20px;">
+                    <input type="text" name="moneyRate" id="moneyRate" class="easyui-numberbox yzss yz-box" style="height: 36px;" placeholder="请输入佣金">
+                </td>
+            </tr>
+            <!-- 第一行结束 -->
+        </table>
+
+        <table class="tab-style">
+            <tr>
+                <td class="name-s" style="padding-left:0">来源</td>
+                <td><input  type="text" name="source" class="yzss" style="width:870px;" placeholder="请输入渠道来源"></input></td>
+            </tr>
+            <tr>
+                <td class="name-s" style="padding-left:0">备注</td>
+                <td><input  type="text" name="remark" class="yzss" style="width:870px;" value="无"></input></td>
+            </tr>
+            <!-- 第二行结束 -->
+        </table>
+
+    </form>
+    <!-- 按钮div开始 -->
+    <div class="btn-box" style="margin-right: 19px;">
+        <button  class="easyui-linkbutton btn-xk" id="close">关闭</button>
+        <button  class="easyui-linkbutton btn-qr" id="submitForm">确认</button>
+    </div>
+    <!-- 按钮div结束 -->
+</div><!-- end id=dialog -->
+
+<!-- S--公用弹窗 -->
+<div class="alert-main">
+    <p class="alert-con">此条学生信息已删除</p>
+    <a class="close-item">×</a>
+</div>
+<script>
+    $(function () {
+        $('.close-item').click(function(){
+            $('.alert-main').hide()
+        })
+    });
+    <!--修改日期输入框样式-->
+    $(function(){
+        $('.combo .combo-text').css({
+            "fontSize":"16px",
+            "color":"#464646",
+            "paddingLeft":"10px",
+            "boxSizing":"border-box"
+        });
+        $('.combo').css("borderRadius","5px");
+    });
+</script>
+<!-- E--公用弹窗 -->
+
+</body>
+</html>

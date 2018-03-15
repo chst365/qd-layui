@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>号码查重</title>
+    
+    <!-- <script type="text/javascript" src="../xppjs/jquery.js"></script> -->
+    <script type="text/javascript" src="jquery-easyui-136/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery-easyui-136/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="DataTables/datatables.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.serialize-object.js"></script>
+    <script type="text/javascript" src="../xppjs/jquery.cookie.js"></script>
+    <script src="../js/layer.js"></script>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/gray/easyui.css"/>
+    <link   rel="stylesheet" type="text/css" href="jquery-easyui-136/themes/icon.css"/>
+    <link   rel="stylesheet" type="text/css" href="DataTables/datatables.css"/>
+    <link   rel="stylesheet" type="text/css" href="../HMcode_QD/HMcss/1a0check.css"/>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        var arr1 = [],arr2=[];
+        var ph = '/QDcrm/aaDphone?qqiu=listByphoneNO';
+        var we = '/QDcrm/aaDweixin?qqiu=listByweixinNO';
+        function ajaxData (data,Url){
+            var send_data = {};
+            Url == ph ? send_data.phoneNO = data : send_data.weixinNO = data;
+            console.log(JSON.stringify(send_data));
+          $.ajax({
+            url:Url,
+            type: "POST",
+            data: JSON.stringify(send_data),
+            contentType: "application/json;charset=UTF-8",
+            success:function(result){
+                var i = JSON.parse(result).message.indexOf('不存在')==-1 ? 1 : 0;
+                if(Url==ph){
+                    tableShow(JSON.parse(result).data);
+
+                  console.log(i);
+                    layer.alert(JSON.parse(result).message, {icon: i});
+//                    alert(JSON.parse(result).message);
+                }
+                if(Url==we){
+                  console.log(11);
+                  tableWShow(JSON.parse(result).data);
+                  layer.alert(JSON.parse(result).message, {icon: i});
+//                  alert(JSON.parse(result).message);
+                }
+            }
+          });
+        }
+        function tableShow(result){
+            $.fn.dataTable.ext.errMode = 'none';
+            $('#G1_tb2').DataTable({
+                    "dom":'frtpi',
+                    bSort:true,
+                    scrollX :670,
+                    "bLengthChange":false,
+                    "searching" : false,
+                    language: {
+                        "sProcessing": "处理中...",
+                        "sLengthMenu": "显示 _MENU_ 项结果",
+                        "sZeroRecords": "没有匹配结果",
+                        "sInfo": "共 _TOTAL_ 项",
+                        "sInfoEmpty": "共 0 项",
+                        "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                        "sInfoPostFix": "",
+                        "sSearch": "搜索:",
+                        "sUrl": "",
+                        "sEmptyTable": "表中数据为空",
+                        "sLoadingRecords": "载入中...",
+                        "sInfoThousands": ",",
+                        "oPaginate": {
+                            "sFirst": "首页",
+                            "sPrevious": "上页",
+                            "sNext": "下页",
+                            "sLast": "末页"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": 以升序排列此列",
+                            "sSortDescending": ": 以降序排列此列"
+                        }
+                    },//国际化语言结束
+                    "scrollCollapse": "true",
+                    destroy: true,
+                    data: result,
+                    columns: [
+                        {"data": "phoneNO"},
+                        {"data": "ditchName"},
+                        {"data": "empDitName"}
+                    ],
+                    "columnDefs":[{
+                        "targets": 1,
+                        "name": "无"
+                    }]
+                });
+        }
+      function tableWShow(result){
+        $.fn.dataTable.ext.errMode = 'none';
+        $('#G3_tb5').DataTable({
+            "dom":'frtpi',
+          bSort:true,
+          scrollX :670,
+          "bLengthChange":false,
+          "searching" : false,
+          language: {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "共 _TOTAL_ 项",
+            "sInfoEmpty": "共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+              "sFirst": "首页",
+              "sPrevious": "上页",
+              "sNext": "下页",
+              "sLast": "末页"
+            },
+            "oAria": {
+              "sSortAscending": ": 以升序排列此列",
+              "sSortDescending": ": 以降序排列此列"
+            }
+          },//国际化语言结束
+          "scrollCollapse": "true",
+          destroy: true,
+          data: result,
+          columns: [
+            {"data": "weixinNO"},
+            {"data": "ditchName"},
+            {"data": "empDitName"}
+          ]
+        });
+      }
+        $("#save_1").click(function(){
+           var data = $("#L1cc")[0].value;
+          arr1.unshift(data);
+          if(arr1.length>10){
+            arr1.length = 10;
+          }
+          for(var i = 0;i<arr1.length;i++){
+            $(".phoneNum")[i].value = arr1[i];
+          }
+          ajaxData(data,ph);
+      
+        });
+        $("#L1cc").keyup(function (event) {
+        if (event.which == 13){
+          $("#save_1").trigger("click");
+        }
+      });
+        $("#save_3").click(function(){
+          var data = $("#L3cc")[0].value;
+          arr2.unshift(data);
+          if(arr2.length>10){
+            arr2.length = 10;
+          }
+          for(var i = 0;i<arr2.length;i++){
+            $(".weiNum")[i].value = arr2[i];
+          }
+          ajaxData(data,we);
+        });
+        $("#L3cc").keyup(function (event) {
+        if (event.which == 13){
+          $("#save_3").trigger("click");
+        }
+      });
+        $("#jump").click(function(){
+          window.location.href="QD_1a1.html";
+          //调用父级弹窗start
+          var $parent = self.parent.$;
+          $parent('#menu_a1').click();
+          //调用父级弹窗end
+        })
+
+    });//end 最外层 $(document).ready
+    </script>
+
+    <style>
+        .dataTables_wrapper .dataTables_info{
+            clear: none;
+            float: right;
+            padding-right: 20px;
+            margin-top:20px;
+        }
+        .dataTables_wrapper .dataTables_paginate{
+            float: right;
+        }
+        #phone_num ,#wei_num{
+            padding-bottom: 20px;
+        }
+       #wei_num ul ,#phone_num ul{
+            overflow: hidden;
+           margin-top:20px;
+       }
+       #wei_num ul li ,#phone_num ul li{
+           width:20%;
+           display: block;
+           float: left;
+           overflow: hidden;
+           line-height: 34px;
+           text-align: -webkit-center;
+       }
+       #wei_num ul li input ,#phone_num ul li input{
+           display: block;
+           width:90%;
+           line-height: 28px;
+           border-radius: 5px;
+                   -webkit-box-sizing: border-box;
+                   -moz-box-sizing: border-box;
+                   box-sizing: border-box;
+           text-align: center;
+           border:1px solid #ccc;
+           }
+    </style>
+</head>
+<body style="overflow: hidden">
+    
+    <div id="fen_container" class="tab-con">
+
+        <div id="ye_1_blank"></div>
+        <div id="ye_2_blank"></div>
+
+        <div id="ye_3_text_container">
+            <div id="header_3_form" style="color: #4c4c4c;">
+
+                    <div style="background-color: #FFFFFF;min-width:400px;float:left;margin-right:4%;width:48%;"><!-- 主框架左半页 start -->
+                    
+                    <div class="left_t" style="min-width: 400px; overflow: hidden">
+                        <div class="tit_style">
+                            <h3>手机号查重</h3>
+                        </div>
+
+                        <table id="header_3_tb1">
+                            <tr>
+                                <td>
+                                    请输入手机号：
+                                    <input type="text" id="L1cc" class="easyui-numberbox" data-options="min:0,precision:0"style="height: 36px;width: 160px;font-size:16px;">
+                                    <!--<input id="L1cc" class="easyui-textbox" validType='phoneNum' name="contactPhone" style="height: 36px;width: 160px;font-size:16px;"data-options="required:true"-->
+                                           <!--missingMessage="电话不能空" type="text">-->
+                                </td>
+                                <td>
+                                    <button id="save_1" class="btn-class"style="margin-left:10px;">查询</button>
+                                </td>
+
+                            </tr><!-- 第一个表格第一行结束 -->
+                            <!-- 第一个表格第二行开始 -->
+                        </table><!-- end id=header_3_tb1 -->
+                        <div id="phone_num" class="dataTable">
+                            <ul>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                            </ul>
+                            <ul>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                                <li><input type="text" disabled class="phoneNum"></li>
+                            </ul>
+                        </div>
+                        <!-- 包裹关系一列表，关系二列表 start-->
+                        <div id="HasG1G2">
+                            <table id="G1_tb2" class="tab-mians dataTable" style="width:100%;">
+                                <!--start 表头 -->
+                                <thead class="tab-tit">
+                                <tr>
+                                    <th style="min-width:100px;">手机号</th>
+                                    <th style="min-width:100px;">渠道名</th>
+                                    <th style="min-width:100px;">负责人</th>
+                                </tr>
+                                </tr>
+                                </thead>
+                                <!--end 表头 -->
+                                <!-- start 表尾 -->
+                                <tfoot class="tab-tit">
+                                <tr>
+                                    <th style="min-width:100px;">手机号</th>
+                                    <th style="min-width:100px;">渠道名</th>
+                                    <th style="min-width:100px;">负责人</th>
+                                </tr>
+                                </tr>
+                                </tfoot>
+                                <!-- end 表尾 -->
+                            </table> <!-- end id为 G1_tb2 -->
+
+                        </div> <!-- 包裹关系一列表，关系二列表 结束-->
+                    </div>
+                    </div><!-- 主框架左半页 end -->
+                    <div style="background-color: #FFFFFF;min-width:400px;height: 700px;float:left;width:48%;overflow:hidden;"><!-- 主框架右半页 start -->
+
+                    <!-- 划文字 -->
+                <div class="tit_style">
+                    <h3>微信号查重</h3>
+                </div>
+
+                    <!-- 包裹班级课程关联列表 start-->
+                    <div id="HasG3">
+
+                    <!-- start  3行布局 -->
+                    <table id="tb_classCour">
+
+                    <tr>
+                    <td>
+                        请输入微信号：<input type="text" id="L3cc"class="easyui-textbox"  data-options="min:0,precision:0"style="height: 36px;width: 160px;font-size:16px;">
+                    </td>
+                    <td >
+                        <button id="save_3" class="btn-class"style="margin-left:10px;">查询</button>
+                    </td>
+                    </tr><!-- 第4表格第二行结束 -->
+
+                    </table><!-- 第4表格结束 header_3_tb4 -->
+                    <div id="wei_num">
+                        <ul>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                        </ul>
+                        <ul>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                            <li><input type="text" disabled class="weiNum"></li>
+                        </ul>
+                    </div>
+                    <!-- end  3行布局 -->
+
+                    <table id="G3_tb5" class="tab-mians dataTable " style="width:100%;">
+                    <!--start 表头 -->
+                        <thead class="tab-tit">
+                            <tr class="row">
+                                <th style="min-width:100px;"class="sorting_disabled">微信号</th>
+                                <th style="min-width:100px;">渠道名</th>
+                                <th style="min-width:100px;">负责人</th>
+                            </tr>
+                        </thead>
+                        <!--end 表头 -->
+                        <!-- start 表尾 -->
+                        <tfoot class="tab-tit">
+                            <tr>
+                                <th style="min-width:100px;"class="sorting_disabled">微信号</th>
+                                <th style="min-width:100px;">渠道名</th>
+                                <th style="min-width:100px;">负责人</th>
+                            </tr>
+                        </tfoot>
+                        <!-- end 表尾 -->
+                    </table> <!-- end id为 G3_tb5 -->
+
+                    </div> <!-- 包裹班级课程关联列表 start-->
+                        <div class="btn-box">
+                            <a href="javascript:void(0)" class="easyui-linkbutton btn-qr" id="jump">前往新增</a>
+                        </div>
+
+
+                    </div><!-- 主框架右半页 end -->
+
+
+            </div><!-- end div  header_3_form-->
+        </div><!-- end div  ye_3_text_container-->
+
+
+
+
+    </div><!-- end div  id="fen_container"-->
+
+</body>
+</html>

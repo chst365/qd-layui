@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>QDcrm</display-name>
+
+	<!-- <welcome-file-list> <welcome-file>index.html</welcome-file> <welcome-file>index.htm</welcome-file> 
+		<welcome-file>index.jsp</welcome-file> <welcome-file>default.html</welcome-file> 
+		<welcome-file>default.htm</welcome-file> <welcome-file>default.jsp</welcome-file> 
+		</welcome-file-list> -->
+
+	<!-- log4j日志使用配置 start -->
+	<servlet>
+		<servlet-name>Log4jinit</servlet-name>
+		<servlet-class>com.QDcrm.controller.Log4jinit</servlet-class>
+		<init-param>
+			<param-name>log4j</param-name>
+			<param-value>WEB-INF/classes/log4j.properties</param-value>
+		</init-param>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<!-- log4j日志使用配置 end -->
+
+	<servlet>
+		<servlet-name>aaEmpname</servlet-name>
+		<servlet-class>com.QDcrm.controller.EmployeeControl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaEmpname</servlet-name>
+		<url-pattern>/aaEmp</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaDepartmentN</servlet-name>
+		<servlet-class>com.QDcrm.controller.DepartmentController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaDepartmentN</servlet-name>
+		<url-pattern>/aaDepartment</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaDitchN</servlet-name>
+		<servlet-class>com.QDcrm.controller.DitchController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaDitchN</servlet-name>
+		<url-pattern>/aaDitch</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaRecordN</servlet-name>
+		<servlet-class>com.QDcrm.controller.RecordController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaRecordN</servlet-name>
+		<url-pattern>/aaRecord</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaQuePageRecordN</servlet-name>
+		<servlet-class>com.QDcrm.query.controller.QuePageRecordController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaQuePageRecordN</servlet-name>
+		<url-pattern>/aaQuePageRecord</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaMyDitchN</servlet-name>
+		<servlet-class>com.QDcrm.query.controller.MyDitchController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaMyDitchN</servlet-name>
+		<url-pattern>/aaMyDitch</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaUserPKN</servlet-name>
+		<servlet-class>com.QDcrm.system.controller.UserPKControl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaUserPKN</servlet-name>
+		<url-pattern>/aaUserPK</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaRoleN</servlet-name>
+		<servlet-class>com.QDcrm.system.controller.RoleController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaRoleN</servlet-name>
+		<url-pattern>/aaRole</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaRoleResourceN</servlet-name>
+		<servlet-class>com.QDcrm.system.controller.RoleResourceController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaRoleResourceN</servlet-name>
+		<url-pattern>/aaRoleResource</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaResourceN</servlet-name>
+		<servlet-class>com.QDcrm.system.controller.ResourceController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaResourceN</servlet-name>
+		<url-pattern>/aaResource</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>aaDengLuN</servlet-name>
+		<servlet-class>com.QDcrm.controller.DengLuControl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>aaDengLuN</servlet-name>
+		<url-pattern>/aaDengLu</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaUserPKpassN</servlet-name>
+		<servlet-class>com.QDcrm.system.controller.UserPKpassController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaUserPKpassN</servlet-name>
+		<url-pattern>/aaUserPKpass</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaDphoneN</servlet-name>
+		<servlet-class>com.QDcrm.controller.DphoneController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaDphoneN</servlet-name>
+		<url-pattern>/aaDphone</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>aaDweixinN</servlet-name>
+		<servlet-class>com.QDcrm.controller.DweixinController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aaDweixinN</servlet-name>
+		<url-pattern>/aaDweixin</url-pattern>
+	</servlet-mapping>
+
+  <servlet>
+    <servlet-name>aaLogQD</servlet-name>
+    <servlet-class>com.QDcrm.controller.LogQDController.LogQDController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>aaLogQD</servlet-name>
+    <url-pattern>/aaLogQD</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>aaLogGX</servlet-name>
+    <servlet-class>com.QDcrm.controller.LogGXController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>aaLogGX</servlet-name>
+    <url-pattern>/aaLogGX</url-pattern>
+  </servlet-mapping>
+
+
+</web-app>

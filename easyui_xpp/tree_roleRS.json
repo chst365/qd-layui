@@ -1,0 +1,182 @@
+[
+	{
+	"id":"A",
+	"text":"渠道",
+	"children":[{
+		"id":"Aa",
+		"text":"欢迎页",
+		"state":"closed"
+	},{
+		"id":"Ad",
+		"text":"号码查重"
+	},{
+		"id":"Ae",
+		"text":"新增渠道"
+	},{
+		"id":"Ab",
+		"text":"管理渠道",
+		"children": [
+			{
+				"id": "Ab1",
+				"text": "编辑"
+			},
+			{
+				"id": "Ab2",
+				"text": "渠道跟进"
+			},
+			{
+				"id": "Ab3",
+				"text": "删除"
+			}
+		]
+	},{
+		"id":"Ac",
+		"text":"我的渠道",
+		"children": [
+			{
+				"id": "Ac1",
+				"text": "编辑"
+			},
+			{
+				"id": "Ac2",
+				"text": "渠道跟进"
+			},
+			{
+				"id": "Ac3",
+				"text": "删除"
+			}
+		]
+	},{
+		"id":"QDRecord渠道跟踪无id",
+		"text":"渠道跟踪",
+		"children": [
+			{
+				"id": "Ab2a",
+				"text": "渠道跟踪编辑"
+			},
+			{
+				"id": "Ab2b",
+				"text": "渠道跟踪删除"
+			}
+		]
+	}
+	]
+	},
+
+	{
+		"id": "B",
+		"text": "员工",
+		"children": [
+			{
+				"id": "Ba",
+				"text": "新增员工"
+			},
+			{
+				"id": "Bb",
+				"text": "管理员工",
+				"children": [
+					{
+						"id": "Bb1",
+						"text": "编辑"
+					},
+					{
+						"id": "Bb2",
+						"text": "删除",
+						"attributes": {
+							"p1": "Custom Attribute1",
+							"p2": "Custom Attribute2"
+						}
+					}
+				]
+			}
+		]
+	},
+	{
+	"id":"C",
+	"text":"设置",
+	"children":[{
+		"id":"Ca",
+		"text":"用户新增"
+		},
+		{
+		"id": "Cb",
+		"text": "用户的管理",
+			"children": [
+				{
+					"id": "Cb1",
+					"text": "编辑"
+				},
+				{
+					"id": "Cb2",
+					"text": "删除",
+					"attributes": {
+						"p1": "Custom Attribute1",
+						"p2": "Custom Attribute2"
+					}
+				}
+			]
+		},
+		{
+		"id": "Cc",
+		"text": "角色新增"},
+		{
+		"id": "Cd",
+		"text": "角色的管理",
+			"children": [
+				{
+					"id": "Cd1",
+					"text": "编辑"
+				},
+				{
+					"id": "Cd2",
+					"text": "删除",
+					"attributes": {
+						"p1": "Custom Attribute1",
+						"p2": "Custom Attribute2"
+					}
+				}
+			]
+		},
+		{
+		"id": "Ce",
+		"text": "部门新增"},
+		{
+		"id": "Cf",
+		"text": "部门的管理",
+			"children": [
+				{
+					"id": "Cf1",
+					"text": "编辑"
+				},
+				{
+					"id": "Cf2",
+					"text": "删除",
+					"attributes": {
+						"p1": "Custom Attribute1",
+						"p2": "Custom Attribute2"
+					}
+				}
+			]
+		},
+		{
+			"id": "Cg",
+			"text": "学员日志",
+			"children": [
+				{
+					"id": "Cg1",
+					"text": "删除"
+				}
+			]
+		},
+		{
+			"id": "Ch",
+			"text": "跟踪表日志",
+			"children": [
+				{
+					"id": "Ch1",
+					"text": "删除"
+				}
+			]
+		}
+	]}
+	]
